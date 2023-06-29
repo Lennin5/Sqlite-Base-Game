@@ -16,6 +16,7 @@ using System.Threading;
 
 public class InitializeDB : MonoBehaviour
 {
+
     private string conn, sqlQuery;
     IDbConnection dbconn;
     IDbCommand dbcmd;
@@ -83,15 +84,18 @@ public class InitializeDB : MonoBehaviour
         dbconn.Open();
 
         // Create tables if not exist
-        string userQuery, levelsQuery;
+        string userQuery, levelsQuery;        
         levelsQuery = "CREATE TABLE IF NOT EXISTS levels (id INTEGER PRIMARY KEY AUTOINCREMENT, level_name varchar(50), score INT)";
         userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, FOREIGN KEY (level_id) REFERENCES levels(id))";
+
         // Create a list of commands to execute
         List<string> commands = new List<string>();
         commands.Add(userQuery);
         commands.Add(levelsQuery);
         try
         {
+            // Variable to control if insert default data or not when creating tables first time
+            bool insertData = true; 
             foreach (string command in commands)
             {
                 // Table name extracted from command query
@@ -105,6 +109,7 @@ public class InitializeDB : MonoBehaviour
                 {
                     // If table already exists, do nothing
                     Debug.LogWarning("Table " + tableName + " already exists");
+                    insertData = false;
                 }
                 else
                 {
@@ -113,12 +118,45 @@ public class InitializeDB : MonoBehaviour
                     dbcmd.CommandText = command;
                     reader = dbcmd.ExecuteReader();
                     Debug.Log("Table " + tableName + " created successfully!");
+
+                    // If tableName is the last item in commands list, proceed to insert default data
+                    if (tableName == commands[commands.Count - 1].Split(' ')[5])
+                    {
+                        if (insertData)
+                        {
+                            // Call method to insert default data
+                            InsertDefaultData();
+                            insertData = false;
+                        }
+                    }
                 }
             }
         }
         catch (Exception e)
         {
-            Debug.Log("Error when creating table: " + e.Message);
+            Debug.Log("Error when creating table: " + e.Message);           
+        }
+
+        void InsertDefaultData()
+        {
+            string insertLevelQuery, insertUserQuery;
+            insertLevelQuery = "INSERT INTO levels (level_name, score) VALUES ('Level 1', 10), ('Level 2', 20), ('Level 3', 30), ('Level 4', 30), ('Level 5', 50)";
+            insertUserQuery = "INSERT INTO users (name, age, level_id) VALUES ('Lennin', 23, 1), ('Josué', 20, 2)";
+            // Create a list of commands to execute
+            List<string> commandsToInsert = new List<string>();
+            commandsToInsert.Add(insertLevelQuery);
+            commandsToInsert.Add(insertUserQuery);
+
+            foreach (string command in commandsToInsert)
+            {
+                // Table name extracted from command query
+                string tableName = command.Split(' ')[2];
+                // Execute command
+                dbcmd = dbconn.CreateCommand();
+                dbcmd.CommandText = command;
+                reader = dbcmd.ExecuteReader();
+                Debug.Log("Default data inserted on table " + tableName + " successfully!");
+            }
         }
 
         // Close db connection
