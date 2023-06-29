@@ -17,62 +17,42 @@ using System.Threading;
 public class InitializeDB : MonoBehaviour
 {
 
-    private string conn, sqlQuery;
+    private string conn;
     IDbConnection dbconn;
     IDbCommand dbcmd;
     private IDataReader reader;
 
-    string DatabaseName = "MySqliteDB.s3db";    
+    public string DatabaseName = "MySqliteDB.s3db";
 
     // Start is called before the first frame update
     void Start()
     {
-        // Initialize database with device type
-        // Now only works for: Windows/Android
-        InitializeSqlite("Windows");
-        //InitializeSqlite("Android");
+        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
+        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+
+        // Initialize database with device type. Now only works for: Windows/Android
+        InitializeSqlite("Windows", filePathWindows);
+        //InitializeSqlite("Android", filePathAndroid);
     }
 
-    private void InitializeSqlite(string deviceType)
+    private void InitializeSqlite(string deviceType, string filepath)
     {
-        // Initialize database with device type
-        switch (deviceType)
+        // If not exist database, create it with name DatabaseName
+        if (!File.Exists(filepath))
         {
-            case "Windows":
-                // Path to database
-                string filepath = Application.dataPath + "/Plugins/" + DatabaseName;
-                // If not exist database, create it with name DatabaseName
-                if (!File.Exists(filepath))
-                {
-                    // If not found will create database
-                    Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. Creating new from \"" +
-                                        Application.dataPath + "/Plugins/");
+            // If not found will create database
 
-                    string url = Path.Combine(Application.streamingAssetsPath, DatabaseName);
-                    UnityWebRequest loadDB = UnityWebRequest.Get(url);
-                    loadDB.SendWebRequest();
-                    Debug.Log("Database created successfully!");
-                }                
+            Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. " +
+                "Creating new from \"" + filepath);
 
-                CreateTables(filepath, deviceType);
-                break;
-            case "Android":                
-                string filepathAndroid = Application.persistentDataPath + "/" + DatabaseName;
-                if (!File.Exists(filepathAndroid))
-                {
-                    // If not found on android will create Tables and database
-                    Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. Creating new from \"" +
-                                     Application.persistentDataPath);
+            string url = Path.Combine(Application.streamingAssetsPath, DatabaseName);
+            UnityWebRequest loadDB = UnityWebRequest.Get(url);
+            loadDB.SendWebRequest();
+            Debug.Log("Database created successfully!");
 
-                    string url = Path.Combine(Application.streamingAssetsPath, DatabaseName);
-                    UnityWebRequest loadDB = UnityWebRequest.Get(url);
-                    loadDB.SendWebRequest();
-                    Debug.Log("Database created successfully!");
-                }                
-
-                CreateTables(filepathAndroid, deviceType);
-                break;
         }
+
+        CreateTables(filepath, deviceType);
     }
 
     private void CreateTables(string filepath, string deviceType)
@@ -137,7 +117,14 @@ public class InitializeDB : MonoBehaviour
             Debug.Log("Error when creating table: " + e.Message);           
         }
 
-        void InsertDefaultData()
+        // Close db connection
+        //dbconn.Close();
+        //Debug.Log("Closed connection to database.");
+    }
+
+    private void InsertDefaultData()
+    {
+        try
         {
             string insertLevelQuery, insertUserQuery;
             insertLevelQuery = "INSERT INTO levels (level_name, score) VALUES ('Level 1', 10), ('Level 2', 20), ('Level 3', 30), ('Level 4', 30), ('Level 5', 50)";
@@ -158,10 +145,11 @@ public class InitializeDB : MonoBehaviour
                 Debug.Log("Default data inserted on table " + tableName + " successfully!");
             }
         }
+        catch (Exception)
+        {
+            Debug.LogWarning("Error when inserting default data");
+        }
 
-        // Close db connection
-        //dbconn.Close();
-        //Debug.Log("Closed connection to database.");
     }
 
 }
