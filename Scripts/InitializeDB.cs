@@ -117,9 +117,9 @@ public class InitializeDB : MonoBehaviour
             Debug.Log("Error when creating table: " + e.Message);           
         }
 
-        // Close db connection
-        //dbconn.Close();
-        //Debug.Log("Closed connection to database.");
+        //Close db connection
+        dbconn.Close();
+        Debug.Log("Closed connection to database.");
     }
 
     private void InsertDefaultData()

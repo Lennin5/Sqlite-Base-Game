@@ -19,9 +19,10 @@ public class ReadData : MonoBehaviour
     void Start()
     {
         // Get GameObject and InitializeDBScript
-        GameObject databaseManagerObject = GameObject.Find("Main Camera");
+        GameObject databaseManagerObject = GameObject.Find("MainCamera");
         InitializeDB initializeDBScript = databaseManagerObject.GetComponent<InitializeDB>();
 
+        // Get database name
         string DatabaseName = initializeDBScript.DatabaseName;
 
         // Path to database        
@@ -29,7 +30,12 @@ public class ReadData : MonoBehaviour
         string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
 
         // Call read function and pass filepath
-        ReadUsers(filePathWindows);
+        LoadReadUsers(filePathWindows);
+    }
+
+    public void LoadReadUsers(string filePath)
+    {
+        ReadUsers(filePath);
     }
 
     private void ReadUsers(string filepath)
@@ -42,22 +48,22 @@ public class ReadData : MonoBehaviour
 
         // int idreaders ;
         string NameRecord;
-        int AgeRecord, LevelIdRecord;
+        int IdRecord, AgeRecord, LevelIdRecord;
         using (dbconn = new SqliteConnection(conn))
         {
             dbconn.Open(); //Open connection to the database.
             IDbCommand dbcmd = dbconn.CreateCommand();
-            string sqlQuery = "SELECT name, age, level_id FROM users";
+            string sqlQuery = "SELECT id, name, age, level_id FROM users";
             dbcmd.CommandText = sqlQuery;
             IDataReader reader = dbcmd.ExecuteReader();
             dataResult.text = "";
             while (reader.Read())
             {
-                // idreaders = reader.GetString(1);
-                NameRecord = reader.GetString(0);
-                AgeRecord = reader.GetInt32(1);
-                LevelIdRecord = reader.GetInt32(2);                
-                dataResult.text += NameRecord + " - " + AgeRecord + " - " + LevelIdRecord + "\n";
+                IdRecord = reader.GetInt32(0);
+                NameRecord = reader.GetString(1);
+                AgeRecord = reader.GetInt32(2);
+                LevelIdRecord = reader.GetInt32(3);                
+                dataResult.text += IdRecord + ": " + NameRecord + " - " + AgeRecord + " - " + LevelIdRecord + "\n";
                 //Debug.Log(" name =" + NameRecord + "Address=" + AgeRecord);
             }
             reader.Close();
