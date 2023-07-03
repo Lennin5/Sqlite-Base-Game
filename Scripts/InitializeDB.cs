@@ -66,7 +66,7 @@ public class InitializeDB : MonoBehaviour
         // Create tables if not exist
         string userQuery, levelsQuery;        
         levelsQuery = "CREATE TABLE IF NOT EXISTS levels (id INTEGER PRIMARY KEY AUTOINCREMENT, level_name varchar(50), score INT)";
-        userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, FOREIGN KEY (level_id) REFERENCES levels(id))";
+        userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, profile_image TEXT, FOREIGN KEY (level_id) REFERENCES levels(id))";
 
         // Create a list of commands to execute
         List<string> commands = new List<string>();
@@ -128,7 +128,7 @@ public class InitializeDB : MonoBehaviour
         {
             string insertLevelQuery, insertUserQuery;
             insertLevelQuery = "INSERT INTO levels (level_name, score) VALUES ('Level 1', 10), ('Level 2', 20), ('Level 3', 30), ('Level 4', 30), ('Level 5', 50)";
-            insertUserQuery = "INSERT INTO users (name, age, level_id) VALUES ('Lennin', 23, 1), ('Josué', 20, 2)";
+            insertUserQuery = "INSERT INTO users (name, age, level_id, profile_image) VALUES ('Lennin', 23, 1, 'Assets/Sprites/Lawliett')";
             // Create a list of commands to execute
             List<string> commandsToInsert = new List<string>();
             commandsToInsert.Add(insertLevelQuery);
