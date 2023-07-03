@@ -128,7 +128,7 @@ public class InitializeDB : MonoBehaviour
         {
             string insertLevelQuery, insertUserQuery;
             insertLevelQuery = "INSERT INTO levels (level_name, score) VALUES ('Level 1', 10), ('Level 2', 20), ('Level 3', 30), ('Level 4', 30), ('Level 5', 50)";
-            insertUserQuery = "INSERT INTO users (name, age, level_id, profile_image) VALUES ('Lennin', 23, 1, 'Assets/Sprites/Lawliett')";
+            insertUserQuery = "INSERT INTO users (name, age, level_id, profile_image) VALUES ('Lennin', 23, 1, 'Sprites/Lawliett')";
             // Create a list of commands to execute
             List<string> commandsToInsert = new List<string>();
             commandsToInsert.Add(insertLevelQuery);
