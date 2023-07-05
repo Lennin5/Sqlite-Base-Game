@@ -42,8 +42,8 @@ public class InitializeDB : MonoBehaviour
         {
             // If not found will create database
 
-            Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. " +
-                "Creating new from \"" + filepath);
+            //Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. " +
+            //    "Creating new from \"" + filepath);
 
             string url = Path.Combine(Application.streamingAssetsPath, DatabaseName);
             UnityWebRequest loadDB = UnityWebRequest.Get(url);
@@ -59,7 +59,7 @@ public class InitializeDB : MonoBehaviour
     {
         // Open db connection
         conn = "URI=file:" + filepath;
-        Debug.Log("Stablishing " + deviceType + " connection to: " + conn);
+        //Debug.Log("Stablishing " + deviceType + " connection to: " + conn);
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
@@ -88,7 +88,7 @@ public class InitializeDB : MonoBehaviour
                 if (reader.Read())
                 {
                     // If table already exists, do nothing
-                    Debug.LogWarning("Table " + tableName + " already exists");
+                    //Debug.LogWarning("Table " + tableName + " already exists");
                     insertData = false;
                 }
                 else
@@ -119,7 +119,7 @@ public class InitializeDB : MonoBehaviour
 
         //Close db connection
         dbconn.Close();
-        Debug.Log("Closed connection to database.");
+        //Debug.Log("Closed connection to database.");
     }
 
     private void InsertDefaultData()
