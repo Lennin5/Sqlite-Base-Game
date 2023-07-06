@@ -1,10 +1,10 @@
 {
   "en": {
-    "greeting": "Hello",
-    "farewell": "Goodbye"
+    "txtButtonLanguage": "Language: EN",
+    "textTest": "Hello"
   },
   "es": {
-    "greeting": "Hola",
-    "farewell": "Adiós"
+    "txtButtonLanguage": "Idioma: ES",
+    "textTest": "Hola"
   }
 }
