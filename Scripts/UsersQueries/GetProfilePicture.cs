@@ -12,16 +12,11 @@ public class GetProfilePicture : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Get InitializeDB script
-        GameObject initializeDBManagerObject = GameObject.Find("MainCamera");
-        InitializeDB initializeDBScript = initializeDBManagerObject.GetComponent<InitializeDB>();
-        // Get database name and path
-        string DatabaseName = initializeDBScript.DatabaseName;
-        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
-        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+        // Get database path
+        string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
         // Open db connection
-        string conn = "URI=file:" + filePathWindows;
+        string conn = "URI=file:" + filePath;
         IDbConnection dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
@@ -29,7 +24,7 @@ public class GetProfilePicture : MonoBehaviour
         {
             // Perform query
             IDbCommand dbcmd = dbconn.CreateCommand();
-            dbcmd.CommandText = "SELECT profile_image FROM users WHERE id=1";
+            dbcmd.CommandText = "SELECT image_path FROM users WHERE id=1";
             IDataReader reader = dbcmd.ExecuteReader();
 
             if (reader.Read())
@@ -43,7 +38,7 @@ public class GetProfilePicture : MonoBehaviour
                 {
                     // Set the loaded image to the profileImage component
                     profileImage.sprite = loadedImage;
-                    Debug.Log("Profile picture loaded successfully!");
+                    //Debug.Log("Profile picture loaded successfully!");
                 }
                 else
                 {

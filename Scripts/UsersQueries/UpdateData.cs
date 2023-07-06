@@ -7,10 +7,6 @@ using UnityEngine;
 //References
 using Mono.Data.Sqlite;
 using TMPro;
-using System.Data;
-using System.Net;
-using System.Xml.Linq;
-using System;
 
 public class UpdateData : MonoBehaviour
 {
@@ -37,20 +33,11 @@ public class UpdateData : MonoBehaviour
     }
     private void UpdateUser(int id, string name)
     {
-        // Get InitializeDB script
-        GameObject initializeDBManagerObject = GameObject.Find("MainCamera");
-        InitializeDB initializeDBScript = initializeDBManagerObject.GetComponent<InitializeDB>();
-        // Get database name and path
-        string DatabaseName = initializeDBScript.DatabaseName;
-        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
-        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
-
-        // Get ReadData script
-        GameObject readDataManagerObject = GameObject.Find("ScrollViewData");
-        ReadData readDataScript = readDataManagerObject.GetComponent<ReadData>();
+        // Get database paths
+        string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
         // Open db connection
-        conn = "URI=file:" + filePathWindows;
+        conn = "URI=file:" + filePath;
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
@@ -63,7 +50,7 @@ public class UpdateData : MonoBehaviour
             dbcmd.ExecuteScalar();
 
             // Call read users function and pass filepath
-            readDataScript.LoadReadUsers(filePathWindows);
+            ReadData.Instance.LoadReadUsers(filePath);
 
             // Close db connection
             dbcmd.Dispose();

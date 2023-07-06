@@ -24,9 +24,8 @@ public class TranslationsSystem : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-            LoadTranslations();
-        }
+            DontDestroyOnLoad(gameObject);                  
+        }   
         else
         {
             Destroy(gameObject);
@@ -38,7 +37,12 @@ public class TranslationsSystem : MonoBehaviour
     //    LoadTranslations();
     //}
 
-    public void RefreshAll()
+    private void Start()
+    {
+        RefreshAllTranslations();
+    }
+
+    public void RefreshAllTranslations()
     {
         LoadTranslations();
     }
@@ -76,20 +80,35 @@ public class TranslationsSystem : MonoBehaviour
                 dbconn.Open(); // Open connection to the database.
                 IDbCommand dbcmd = dbconn.CreateCommand();
                 string sqlQuery = "SELECT language FROM users where id=1";
-                dbcmd.CommandText = sqlQuery;
+
+                // Check if 'users' table exists
+                dbcmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='users'";
                 IDataReader reader = dbcmd.ExecuteReader();
 
                 if (reader.Read())
                 {
-                    string language = reader.GetString(0);
-                    SetLanguage(language);
+                    // If 'users' table exists, execute the query to retrieve language
+                    reader.Close();
+                    dbcmd.CommandText = sqlQuery;
+                    reader = dbcmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        string language = reader.GetString(0);
+                        SetLanguage(language);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("No language data found in the database.");
+                    }
+
+                    reader.Close();
                 }
                 else
                 {
-                    Debug.LogWarning("No language data found in the database.");
+                    Debug.Log("LA DB AUN NO SE HA CREADO. POSIBLEMENTE ESTES INGRESANDO POR PRIMERA VEZ AL GAME xd");
                 }
 
-                reader.Close();
                 reader = null;
                 dbcmd.Dispose();
                 dbcmd = null;
@@ -101,6 +120,7 @@ public class TranslationsSystem : MonoBehaviour
             Debug.LogError("Translations file not found!");
         }
     }
+
 
     public void SetLanguage(string language)
     {

@@ -13,10 +13,7 @@ public class ButtonScript : MonoBehaviour
 
     public void OnButtonClick()
     {
-        // Get InitializeDB script
-        GameObject localizationManagerObject = GameObject.Find("LocalizationManager");
-        LocalizationManager locationManagerScript = localizationManagerObject.GetComponent<LocalizationManager>();
-        string currentLanguage = locationManagerScript.currentLanguage;
+        string currentLanguage = LocalizationManager.Instance.currentLanguage;
         Debug.Log("Current language: " + currentLanguage);
 
         if (currentLanguage == "en")

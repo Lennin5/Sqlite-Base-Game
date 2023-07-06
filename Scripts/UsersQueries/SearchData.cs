@@ -31,16 +31,11 @@ public class SearchData : MonoBehaviour
 
     private void SearchUser(string name)
     {
-        // Get InitializeDB script
-        GameObject initializeDBManagerObject = GameObject.Find("MainCamera");
-        InitializeDB initializeDBScript = initializeDBManagerObject.GetComponent<InitializeDB>();
-        // Get database name and path
-        string DatabaseName = initializeDBScript.DatabaseName;
-        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
-        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+        // Get database path
+        string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
         // Open db connection
-        conn = "URI=file:" + filePathWindows;
+        conn = "URI=file:" + filePath;
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 

@@ -9,16 +9,25 @@ using TMPro;
 
 public class ReadData : MonoBehaviour
 {
+    public static ReadData Instance { get; private set; }
     private string conn;
     IDbConnection dbconn;    
 
     public TMP_Text dataResult;
 
+    private void Awake()
+    {
+        // Assign 'this' when Instance method or variable is needed in another script
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        // Get GameObject and InitializeDBScript
+        // Get GameObject and InitializeDBScript (Another way to get script from another GameObject)
         GameObject databaseManagerObject = GameObject.Find("MainCamera");
         InitializeDB initializeDBScript = databaseManagerObject.GetComponent<InitializeDB>();
 
@@ -62,7 +71,7 @@ public class ReadData : MonoBehaviour
                 IdRecord = reader.GetInt32(0);
                 NameRecord = reader.GetString(1);
                 AgeRecord = reader.GetInt32(2);
-                LevelIdRecord = reader.GetInt32(3);                
+                LevelIdRecord = reader.GetInt32(3);
                 dataResult.text += IdRecord + ": " + NameRecord + " - " + AgeRecord + " - " + LevelIdRecord + "\n";
                 //Debug.Log(" name =" + NameRecord + "Address=" + AgeRecord);
             }

@@ -16,57 +16,73 @@ using System.Threading;
 
 public class InitializeDB : MonoBehaviour
 {
+    public static InitializeDB Instance { get; private set; }
 
     private string conn;
     IDbConnection dbconn;
     IDbCommand dbcmd;
     private IDataReader reader;
 
+    public string DeviceType = "Windows";
     public string DatabaseName = "MySqliteDB.s3db";
+    public string CurrentDatabasePath;
 
+    private void Awake()
+    {
+        // Assign 'this' when Instance method or variable is needed in another script
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
+        // Filepath to database
         string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
         string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
 
+        // Validate device type to set database path
+        if (DeviceType == "Windows")
+            CurrentDatabasePath = filePathWindows;
+        else if (DeviceType == "Android")
+            CurrentDatabasePath = filePathAndroid;
+
         // Initialize database with device type. Now only works for: Windows/Android
-        InitializeSqlite("Windows", filePathWindows);
-        //InitializeSqlite("Android", filePathAndroid);
+        InitializeSqlite(DeviceType, CurrentDatabasePath);
     }
 
-    private void InitializeSqlite(string deviceType, string filepath)
+    private void InitializeSqlite(string deviceType, string filePath)
     {
         // If not exist database, create it with name DatabaseName
-        if (!File.Exists(filepath))
+        if (!File.Exists(filePath))
         {
             // If not found will create database
 
             //Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. " +
-            //    "Creating new from \"" + filepath);
+            //    "Creating new from \"" + filePath);
 
             string url = Path.Combine(Application.streamingAssetsPath, DatabaseName);
             UnityWebRequest loadDB = UnityWebRequest.Get(url);
             loadDB.SendWebRequest();
-            Debug.Log("Database created successfully!");
-
+            Debug.Log("Database created successfully!");            
         }
 
-        CreateTables(filepath, deviceType);
+        CreateTables(filePath, deviceType);
     }
 
-    private void CreateTables(string filepath, string deviceType)
+    private void CreateTables(string filePath, string deviceType)
     {
         // Open db connection
-        conn = "URI=file:" + filepath;
-        //Debug.Log("Stablishing " + deviceType + " connection to: " + conn);
+        conn = "URI=file:" + filePath;
+        Debug.Log("Stablishing " + deviceType + " connection to: " + conn);
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
         // Create tables if not exist
         string userQuery, levelsQuery;        
         levelsQuery = "CREATE TABLE IF NOT EXISTS levels (id INTEGER PRIMARY KEY AUTOINCREMENT, level_name varchar(50), score INT)";
-        userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, profile_image TEXT, FOREIGN KEY (level_id) REFERENCES levels(id))";
+        userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, language VARCHAR(2), image_path TEXT, FOREIGN KEY (level_id) REFERENCES levels(id))";
 
         // Create a list of commands to execute
         List<string> commands = new List<string>();
@@ -88,7 +104,7 @@ public class InitializeDB : MonoBehaviour
                 if (reader.Read())
                 {
                     // If table already exists, do nothing
-                    //Debug.LogWarning("Table " + tableName + " already exists");
+                    Debug.LogWarning("Table " + tableName + " already exists");
                     insertData = false;
                 }
                 else
@@ -119,7 +135,7 @@ public class InitializeDB : MonoBehaviour
 
         //Close db connection
         dbconn.Close();
-        //Debug.Log("Closed connection to database.");
+        Debug.Log("Closed connection to database.");
     }
 
     private void InsertDefaultData()
@@ -128,7 +144,7 @@ public class InitializeDB : MonoBehaviour
         {
             string insertLevelQuery, insertUserQuery;
             insertLevelQuery = "INSERT INTO levels (level_name, score) VALUES ('Level 1', 10), ('Level 2', 20), ('Level 3', 30), ('Level 4', 30), ('Level 5', 50)";
-            insertUserQuery = "INSERT INTO users (name, age, level_id, profile_image) VALUES ('Lennin', 23, 1, 'Sprites/Lawliett')";
+            insertUserQuery = "INSERT INTO users (name, age, level_id, language, image_path) VALUES ('Lennin', 23, 1, 'en', 'Sprites/Lawliett')";
             // Create a list of commands to execute
             List<string> commandsToInsert = new List<string>();
             commandsToInsert.Add(insertLevelQuery);

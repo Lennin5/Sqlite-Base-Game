@@ -15,15 +15,11 @@ public class SwitchLanguage : MonoBehaviour
 
     public void UpdateLanguageButton()
     {
-        // Get InitializeDB script
-        GameObject initializeDBManagerObject = GameObject.Find("MainCamera");
-        InitializeDB initializeDBScript = initializeDBManagerObject.GetComponent<InitializeDB>();
-        // Get database name and path
-        string DatabaseName = initializeDBScript.DatabaseName;
-        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
+        // Get database path
+        string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
         // Open db connection
-        conn = "URI=file:" + filePathWindows;
+        conn = "URI=file:" + filePath;
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
@@ -31,7 +27,7 @@ public class SwitchLanguage : MonoBehaviour
         {
             // Update language value
             dbcmd = dbconn.CreateCommand();
-            sqlQuery = "UPDATE users SET language = CASE WHEN language = 'es' THEN 'en' ELSE 'es' END";
+            sqlQuery = "UPDATE users SET language = CASE WHEN language = 'es' THEN 'en' ELSE 'es' END WHERE id = 1";
             dbcmd.CommandText = sqlQuery;
             dbcmd.ExecuteNonQuery();
 
@@ -43,7 +39,7 @@ public class SwitchLanguage : MonoBehaviour
             GameObject translationsSystemManagerObject = GameObject.Find("TranslationsSystem");
             TranslationsSystem translationsSystemScript = translationsSystemManagerObject.GetComponent<TranslationsSystem>();
 
-            translationsSystemScript.RefreshAll();
+            translationsSystemScript.RefreshAllTranslations();
         }
         catch (Exception e)
         {
