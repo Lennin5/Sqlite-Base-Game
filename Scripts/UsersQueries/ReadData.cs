@@ -27,19 +27,22 @@ public class ReadData : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Get GameObject and InitializeDBScript (Another way to get script from another GameObject)
-        GameObject databaseManagerObject = GameObject.Find("MainCamera");
-        InitializeDB initializeDBScript = databaseManagerObject.GetComponent<InitializeDB>();
+        // (Another way to get script from another GameObject)
+        //// Get GameObject and InitializeDBScript
+        //GameObject databaseManagerObject = GameObject.Find("MainCamera");
+        //InitializeDB initializeDBScript = databaseManagerObject.GetComponent<InitializeDB>();
 
-        // Get database name
-        string DatabaseName = initializeDBScript.DatabaseName;
+        //// Get database name
+        //string DatabaseName = initializeDBScript.DatabaseName;
 
-        // Path to database        
-        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
-        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+        //// Path to database        
+        //string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
+        //string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+
+        string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
         // Call read function and pass filepath
-        LoadReadUsers(filePathWindows);
+        LoadReadUsers(filePath);
     }
 
     public void LoadReadUsers(string filePath)
@@ -55,24 +58,23 @@ public class ReadData : MonoBehaviour
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
-        // int idreaders ;
-        string NameRecord;
-        int IdRecord, AgeRecord, LevelIdRecord;
         using (dbconn = new SqliteConnection(conn))
         {
             dbconn.Open(); //Open connection to the database.
             IDbCommand dbcmd = dbconn.CreateCommand();
-            string sqlQuery = "SELECT id, name, age, level_id FROM users";
+            string sqlQuery = "SELECT id, name, age, level_id, language, image_path FROM users";
             dbcmd.CommandText = sqlQuery;
             IDataReader reader = dbcmd.ExecuteReader();
             dataResult.text = "";
             while (reader.Read())
             {
-                IdRecord = reader.GetInt32(0);
-                NameRecord = reader.GetString(1);
-                AgeRecord = reader.GetInt32(2);
-                LevelIdRecord = reader.GetInt32(3);
-                dataResult.text += IdRecord + ": " + NameRecord + " - " + AgeRecord + " - " + LevelIdRecord + "\n";
+                int IdRecord = reader.GetInt32(0);
+                string NameRecord = reader.GetString(1);
+                int AgeRecord = reader.GetInt32(2);
+                int LevelIdRecord = reader.GetInt32(3);
+                string LanguageRecord = reader.GetString(4);
+                string ImagePathRecord = reader.GetString(5);
+                dataResult.text += IdRecord + ": " + NameRecord + " - " + AgeRecord + " - " + LevelIdRecord + " - " + LanguageRecord + " - " + ImagePathRecord + "\n";
                 //Debug.Log(" name =" + NameRecord + "Address=" + AgeRecord);
             }
             reader.Close();

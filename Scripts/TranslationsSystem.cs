@@ -31,7 +31,8 @@ public class TranslationsSystem : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    
+    // This isn't efficient, but it works
     //private void Update()
     //{
     //    LoadTranslations();
@@ -49,29 +50,20 @@ public class TranslationsSystem : MonoBehaviour
 
     private void LoadTranslations()
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "translations.json");
+        string filePathJson = Path.Combine(Application.streamingAssetsPath, "translations.json");
 
-        if (File.Exists(filePath))
+        if (File.Exists(filePathJson))
         {
-            string jsonText = File.ReadAllText(filePath);
+            string jsonText = File.ReadAllText(filePathJson);
             translations = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(jsonText);
 
             // print greeting value from english language
             //Debug.Log("Greeting: " + translations["en"]["greeting"]);
 
-            // Get GameObject and InitializeDBScript
-            GameObject databaseManagerObject = GameObject.Find("MainCamera");
-            InitializeDB initializeDBScript = databaseManagerObject.GetComponent<InitializeDB>();
-
-            // Get database name
-            string DatabaseName = initializeDBScript.DatabaseName;
-
-            // Path to database        
-            string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
-            string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+            string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
             // Open db connection
-            conn = "URI=file:" + filePathWindows;
+            conn = "URI=file:" + filePath;
             dbconn = new SqliteConnection(conn);
             dbconn.Open();
 
@@ -80,35 +72,20 @@ public class TranslationsSystem : MonoBehaviour
                 dbconn.Open(); // Open connection to the database.
                 IDbCommand dbcmd = dbconn.CreateCommand();
                 string sqlQuery = "SELECT language FROM users where id=1";
-
-                // Check if 'users' table exists
-                dbcmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='users'";
+                dbcmd.CommandText = sqlQuery;
                 IDataReader reader = dbcmd.ExecuteReader();
 
                 if (reader.Read())
                 {
-                    // If 'users' table exists, execute the query to retrieve language
-                    reader.Close();
-                    dbcmd.CommandText = sqlQuery;
-                    reader = dbcmd.ExecuteReader();
-
-                    if (reader.Read())
-                    {
-                        string language = reader.GetString(0);
-                        SetLanguage(language);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("No language data found in the database.");
-                    }
-
-                    reader.Close();
+                    string language = reader.GetString(0);
+                    SetLanguage(language);
                 }
                 else
                 {
-                    Debug.Log("LA DB AUN NO SE HA CREADO. POSIBLEMENTE ESTES INGRESANDO POR PRIMERA VEZ AL GAME xd");
+                    Debug.LogWarning("No language data found in the database.");
                 }
 
+                reader.Close();
                 reader = null;
                 dbcmd.Dispose();
                 dbcmd = null;
@@ -121,14 +98,13 @@ public class TranslationsSystem : MonoBehaviour
         }
     }
 
-
     public void SetLanguage(string language)
     {
         if (translations.ContainsKey(language))
         {
             currentLanguage = language;
             // Aquí puedes notificar a otros objetos que el idioma ha cambiado, para que actualicen sus textos
-            Debug.Log("Language changed to: " + language);
+            Debug.Log("<color=aqua>Language changed to: " + language + "</color>");
             // Add text to button
             txtBtnLanguage.text = translations[currentLanguage]["txtButtonLanguage"];
         }

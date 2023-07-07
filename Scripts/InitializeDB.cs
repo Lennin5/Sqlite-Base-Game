@@ -23,7 +23,9 @@ public class InitializeDB : MonoBehaviour
     IDbCommand dbcmd;
     private IDataReader reader;
 
-    public string DeviceType = "Windows";
+    private string limaColor = "#76ff03";
+
+    public string DeviceType;
     public string DatabaseName = "MySqliteDB.s3db";
     public string CurrentDatabasePath;
 
@@ -34,22 +36,35 @@ public class InitializeDB : MonoBehaviour
         {
             Instance = this;
         }
+
+        // Add device type to database path (SWITCH BEFORE BUILDING GAME)
+        DeviceType = "Windows";
+
+        // Filepath to database
+        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
+        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
+        
+        // Validate device type to set database path
+        switch (DeviceType)
+        {
+            case "Windows":
+                CurrentDatabasePath = filePathWindows;
+                break;
+            case "Android":
+                CurrentDatabasePath = filePathAndroid;
+                break;
+            default:
+                Debug.LogError("Device type not found");
+                break;
+        }
+
+        // Initialize database with device type. Now only works for: Windows/Android
+        InitializeSqlite(DeviceType, CurrentDatabasePath);
     }
     // Start is called before the first frame update
     void Start()
     {
-        // Filepath to database
-        string filePathWindows = Application.dataPath + "/Plugins/" + DatabaseName;
-        string filePathAndroid = Application.persistentDataPath + "/" + DatabaseName;
-
-        // Validate device type to set database path
-        if (DeviceType == "Windows")
-            CurrentDatabasePath = filePathWindows;
-        else if (DeviceType == "Android")
-            CurrentDatabasePath = filePathAndroid;
-
-        // Initialize database with device type. Now only works for: Windows/Android
-        InitializeSqlite(DeviceType, CurrentDatabasePath);
+        // Emprty...
     }
 
     private void InitializeSqlite(string deviceType, string filePath)
@@ -59,13 +74,13 @@ public class InitializeDB : MonoBehaviour
         {
             // If not found will create database
 
-            //Debug.LogWarning("File \"" + DatabaseName + "\" doesn't exist. " +
-            //    "Creating new from \"" + filePath);
+            Debug.LogWarning("<color=yellow>File \"" + DatabaseName + "\" doesn't exist. " +
+                "Creating new from \"" + filePath + "</color>");
 
             string url = Path.Combine(Application.streamingAssetsPath, DatabaseName);
             UnityWebRequest loadDB = UnityWebRequest.Get(url);
             loadDB.SendWebRequest();
-            Debug.Log("Database created successfully!");            
+            Debug.Log("<color=cyan>Database created successfully!</color>");
         }
 
         CreateTables(filePath, deviceType);
@@ -75,14 +90,14 @@ public class InitializeDB : MonoBehaviour
     {
         // Open db connection
         conn = "URI=file:" + filePath;
-        Debug.Log("Stablishing " + deviceType + " connection to: " + conn);
+        Debug.Log("<color=#00FF00>Stablishing " + deviceType + " connection to: " + conn + "</color>");
         dbconn = new SqliteConnection(conn);
         dbconn.Open();
 
         // Create tables if not exist
         string userQuery, levelsQuery;        
         levelsQuery = "CREATE TABLE IF NOT EXISTS levels (id INTEGER PRIMARY KEY AUTOINCREMENT, level_name varchar(50), score INT)";
-        userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, language VARCHAR(2), image_path TEXT, FOREIGN KEY (level_id) REFERENCES levels(id))";
+        userQuery = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), age INT, level_id INT, language CHAR(2), image_path TEXT, FOREIGN KEY (level_id) REFERENCES levels(id))";
 
         // Create a list of commands to execute
         List<string> commands = new List<string>();
@@ -104,7 +119,7 @@ public class InitializeDB : MonoBehaviour
                 if (reader.Read())
                 {
                     // If table already exists, do nothing
-                    Debug.LogWarning("Table " + tableName + " already exists");
+                    Debug.Log("<color=yellow>[INFO] Table " + tableName + " already exists</color>");
                     insertData = false;
                 }
                 else
@@ -113,7 +128,8 @@ public class InitializeDB : MonoBehaviour
                     reader.Close();
                     dbcmd.CommandText = command;
                     reader = dbcmd.ExecuteReader();
-                    Debug.Log("Table " + tableName + " created successfully!");
+                    //Debug.Log("Table " + tableName + " created successfully!");
+                    Debug.Log("<color=cyan>Table " + tableName + " created successfully!</color>");
 
                     // If tableName is the last item in commands list, proceed to insert default data
                     if (tableName == commands[commands.Count - 1].Split(' ')[5])
@@ -135,7 +151,7 @@ public class InitializeDB : MonoBehaviour
 
         //Close db connection
         dbconn.Close();
-        Debug.Log("Closed connection to database.");
+        Debug.Log("<color="+limaColor+">Closed connection to database!</color>");
     }
 
     private void InsertDefaultData()
@@ -158,12 +174,13 @@ public class InitializeDB : MonoBehaviour
                 dbcmd = dbconn.CreateCommand();
                 dbcmd.CommandText = command;
                 reader = dbcmd.ExecuteReader();
-                Debug.Log("Default data inserted on table " + tableName + " successfully!");
+                //Debug.Log("Default data inserted on table " + tableName + " successfully!");
+                Debug.Log("<color=magenta>Default data inserted on table " + tableName + " successfully!</color>");
             }
         }
         catch (Exception)
         {
-            Debug.LogWarning("Error when inserting default data");
+            Debug.LogError("Error when inserting default data");
         }
 
     }

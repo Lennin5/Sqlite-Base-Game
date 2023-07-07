@@ -7,10 +7,23 @@ using System.Data;
 
 public class GetProfilePicture : MonoBehaviour
 {
+    public static GetProfilePicture Instance { get; private set; }
     public Image profileImage;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
     // Start is called before the first frame update
     void Start()
+    {
+        GetProfileData();
+    }
+
+    private void GetProfileData()
     {
         // Get database path
         string filePath = InitializeDB.Instance.CurrentDatabasePath;

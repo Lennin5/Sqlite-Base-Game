@@ -28,11 +28,13 @@ public class InsertData : MonoBehaviour
         string name = "Helena";
         int age = 25;
         int level_id = 1;
+        string language = "es";
+        string image_path = "Sprites/Lawliett";
 
         // Call insert function and pass values
-        InsertUser(name, age, level_id);
+        InsertUser(name, age, level_id, language, image_path);
     }
-    private void InsertUser(string name, int age, int level_id)
+    private void InsertUser(string name, int age, int level_id, string language, string image_path)
     {
 
         // Get database path       
@@ -47,7 +49,7 @@ public class InsertData : MonoBehaviour
         {
             // Insert data
             dbcmd = dbconn.CreateCommand();
-            sqlQuery = string.Format("INSERT INTO users (name, age, level_id) values (\"{0}\",\"{1}\",\"{2}\")", name, age, level_id);
+            sqlQuery = string.Format("INSERT INTO users (name, age, level_id, language, image_path) values (\"{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\")", name, age, level_id, language, image_path);
             dbcmd.CommandText = sqlQuery;
             dbcmd.ExecuteScalar();
 

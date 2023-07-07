@@ -33,7 +33,6 @@ public class SwitchLanguage : MonoBehaviour
 
             dbcmd.Dispose();
             dbconn.Close();
-            Debug.Log("Language Updated");
 
             // Get TranslationsSystem script
             GameObject translationsSystemManagerObject = GameObject.Find("TranslationsSystem");

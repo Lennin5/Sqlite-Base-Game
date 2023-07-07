@@ -17,7 +17,7 @@ public class SearchData : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Empty
+        // Empty...
     }
 
     public void SearchUserButton()
@@ -43,7 +43,7 @@ public class SearchData : MonoBehaviour
         {
             // Search data
             IDbCommand dbcmd = dbconn.CreateCommand();
-            string sqlQuery = string.Format("SELECT id, name, age, level_id FROM users WHERE name LIKE '%{0}%'", name);
+            string sqlQuery = string.Format("SELECT id, name, age, level_id, language, image_path FROM users WHERE name LIKE '%{0}%'", name);
             dbcmd.CommandText = sqlQuery;
             IDataReader reader = dbcmd.ExecuteReader();
             dataResult.text = "";
@@ -53,7 +53,9 @@ public class SearchData : MonoBehaviour
                 string userName = reader.GetString(1);
                 int age = reader.GetInt32(2);
                 int levelId = reader.GetInt32(3);
-                dataResult.text += id + ": " + userName + " - " + age + " - " + levelId + "\n";
+                string language = reader.GetString(4);
+                string imagePath = reader.GetString(5);
+                dataResult.text += id + ": " + userName + " - " + age + " - " + levelId + " - " + language + " - " + imagePath + " - " + "\n";
             }
             reader.Close();
             dbcmd.Dispose();
