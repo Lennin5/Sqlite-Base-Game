@@ -11,9 +11,7 @@ public class TranslationsSystem : MonoBehaviour
     // Translations instance, dictionary and current language
     public static TranslationsSystem Instance { get; private set; }
     public Dictionary<string, Dictionary<string, string>> translations;
-    public string currentLanguage = "en";
-
-    public TMP_Text txtBtnLanguage;
+    public string currentLanguage;
 
     // Database connection
     private string conn;
@@ -50,7 +48,8 @@ public class TranslationsSystem : MonoBehaviour
 
     private void LoadTranslations()
     {
-        string filePathJson = Path.Combine(Application.streamingAssetsPath, "translations.json");
+        string filePathJson = Path.Combine(Application.streamingAssetsPath, "Translations.json");
+        //string filePathJson = Path.Combine(Application.dataPath + "/Resources/", "Translations2.json"); // Another way to load json file in "Resources" folder
 
         if (File.Exists(filePathJson))
         {
@@ -58,7 +57,7 @@ public class TranslationsSystem : MonoBehaviour
             translations = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(jsonText);
 
             // print greeting value from english language
-            //Debug.Log("Greeting: " + translations["en"]["greeting"]);
+            //Debug.Log("Greeting: " + translations["en"]["txtListUsers"]);
 
             string filePath = InitializeDB.Instance.CurrentDatabasePath;
 
@@ -106,7 +105,7 @@ public class TranslationsSystem : MonoBehaviour
             // Aquí puedes notificar a otros objetos que el idioma ha cambiado, para que actualicen sus textos
             Debug.Log("<color=aqua>Language changed to: " + language + "</color>");
             // Add text to button
-            txtBtnLanguage.text = translations[currentLanguage]["txtButtonLanguage"];
+            TranslatedTerms.Instance.UpdateTranlatedTerms();
         }
         else
         {
