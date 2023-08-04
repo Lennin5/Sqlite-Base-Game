@@ -1,0 +1,6 @@
+Instalar Newtonsoft (Recordar que para poder usarlo necesitaremos instalarlo en VS y en Unity con el link de abajo)
+https://github.com/jilleJr/Newtonsoft.Json-for-Unity/wiki/Install-official-via-UPM
+
+===========================================================================================================================================================
+
+
